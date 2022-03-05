@@ -46,11 +46,6 @@ class Report(models.Model):
     def __str__(self):
         return f"{self.user.username}'s Report"
 
-    def save(self, *args, **kwargs):
-        if not self.timestamp:
-            self.timestamp = datetime.datetime.now().time()
-        super().save(*args, **kwargs)
-
 @receiver(pre_save, sender=Task)
 def update_task_history(instance, **kwargs):
     if instance.status == "COMPLETED":
