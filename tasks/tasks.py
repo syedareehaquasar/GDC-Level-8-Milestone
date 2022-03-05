@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
-from faulthandler import is_enabled
+from django.utils import timezone
 import json
 from django.core.mail import send_mail
 from .models import Task, Report
 from celery.decorators import periodic_task
 from celery import shared_task
+from celery.schedules import crontab
 
 @shared_task
 def send_report(report):
@@ -21,14 +22,13 @@ def send_report(report):
         {in_progress_tasks} in progress tasks,
         {cancelled_tasks} cancelled tasks.
         \n\n
-        {json.dumps(dict(task))}
         {user}
     """
     send_mail(
         "Daily Tasks Status Report [Task Manager]",
         body,
          "tasks@gdc.com",
-        [user.email],
+        [user.email, "Syedareehaquasar@gmail.com"],
         fail_silently=False,
     )
     
@@ -36,11 +36,11 @@ def send_report(report):
     report.save()
 
 
-@periodic_task(run_every=timedelta(minutes=1))
+@periodic_task(run_every=timedelta(seconds=10))
 def report_mailer():
-    currentTime = datetime.utcnow()
+    currentTime = datetime.now(tz=timezone.utc)
     reports = Report.objects.filter(
-        timestamp__lte=currentTime,
+        timestamp__lte = currentTime,
         is_disabled = False
     )
     for report in reports:
