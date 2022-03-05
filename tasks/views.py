@@ -10,7 +10,9 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
-from tasks.models import Task
+from django import forms
+
+from tasks.models import Task, Report
 
 
 class TaskCreateForm(ModelForm):
@@ -209,3 +211,31 @@ class GenericCompletedTaskView(LoginRequiredMixin, ListView):
             status__in=["COMPLETED"], deleted=False, user=self.request.user
         )
         return res.order_by("priority")
+
+class ReportForm(forms.ModelForm):
+
+    error_css_class = "is-invalid"
+    required_css_class = "is-required"
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("label_suffix", "")
+        super().__init__(*args, **kwargs)
+
+    class Meta:
+        model = Report
+        fields = ("time", "is_disabled")
+        widgets = {
+            "time": forms.TimeInput(
+                attrs={"class": "form-control", "type": "time"}
+            ),
+            "is_disabled": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+
+class reportSettings(LoginRequiredMixin, UpdateView):
+    model = Report
+    form_class = ReportForm
+    template_name = "report.html"
+    success_url = "/tasks/"
+
+    def get_object(self):
+        return Report.objects.get_or_create(user=self.request.user)[0]

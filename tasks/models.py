@@ -1,10 +1,10 @@
+import datetime
 from django.db import models
 
 from django.contrib.auth.models import User
 
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
-
 
 STATUS_CHOICES = (
     ("PENDING", "PENDING"),
@@ -35,8 +35,21 @@ class TaskHistory(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     old_status = models.CharField(max_length=100, choices=STATUS_CHOICES)
     new_status = models.CharField(max_length=100, choices=STATUS_CHOICES)
-    updation_date = models.DateTimeField(auto_now=True)
+    timestamp = models.DateTimeField(auto_now=True)
 
+class Report(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(null=True, blank=True)
+    time = models.TimeField(default="00:00:00")
+    is_disabled = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s Report"
+
+    def save(self, *args, **kwargs):
+        if not self.timestamp:
+            self.timestamp = datetime.datetime.now().time()
+        super().save(*args, **kwargs)
 
 @receiver(pre_save, sender=Task)
 def update_task_history(instance, **kwargs):

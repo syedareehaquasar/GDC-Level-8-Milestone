@@ -45,7 +45,7 @@ class TaskHistorySerializer(ModelSerializer):
 
     class Meta:
         model = TaskHistory
-        fields = ["id", "task", "old_status", "new_status", "updation_date"]
+        fields = ["id", "task", "old_status", "new_status", "timestamp"]
 
 
 class TaskFilter(FilterSet):
@@ -57,7 +57,7 @@ class TaskFilter(FilterSet):
 class TaskHistoryFilter(FilterSet):
     old_status = ChoiceFilter(choices=STATUS_CHOICES)
     new_status = ChoiceFilter(choices=STATUS_CHOICES)
-    updation_date = DateFromToRangeFilter()
+    timestamp = DateFromToRangeFilter()
 
 
 class TaskViewSet(ModelViewSet):

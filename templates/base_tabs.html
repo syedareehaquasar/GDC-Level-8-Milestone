@@ -6,7 +6,7 @@
 </div>
 
 <div class="text-xs text-gray-600 pb-3">
-	{% comment %} Tasks: {{ tasks|length }} {% endcomment %}
+	Tasks: {{ tasks.length }}
 	{{completed_tasks}} out of {{total_tasks}} are completed
 </div>
 
@@ -14,17 +14,21 @@
 
 <a href="/create-task/">
 	<button
-		class="bg-red-500 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md font-base text-center mt-3 w-full"
-	>
+		class="bg-red-500 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md font-base text-center mt-3 w-full">
 		Add
-	</button></a
->
+	</button></a>
 <ul class="flex flex-row flex-wrap justify-center mt-2">
 	{% for page in paginator.page_range %} (
 	<li class="text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-200 p-1">
 		<a href="?page={{page}}&search={{request.GET.search}}">{{page}}</a>
 	</li>
-	 ) {% endfor %}
+	) {% endfor %}
 </ul>
+
+</br>
+<a href="/reportSettings/">
+	<div class="text-lg text-red-600 text-center bg-gray-200 hover:bg-gray-400 py-2 px-4 rounded-md">Report Settings
+	</div>
+</a>
 
 {% endblock content %}

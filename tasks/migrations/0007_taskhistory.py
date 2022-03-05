@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('old_status', models.CharField(choices=[('PENDING', 'PENDING'), ('IN_PROGRESS', 'IN_PROGRESS'), ('COMPLETED', 'COMPLETED'), ('CANCELLED', 'CANCELLED')], max_length=100)),
                 ('new_status', models.CharField(choices=[('PENDING', 'PENDING'), ('IN_PROGRESS', 'IN_PROGRESS'), ('COMPLETED', 'COMPLETED'), ('CANCELLED', 'CANCELLED')], max_length=100)),
-                ('updation_date', models.DateTimeField(auto_now=True)),
+                ('timestamp', models.DateTimeField(auto_now=True)),
                 ('task', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='tasks.task')),
             ],
         ),

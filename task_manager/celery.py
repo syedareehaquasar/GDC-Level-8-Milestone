@@ -1,12 +1,7 @@
-import time
 import os
-
-from django.core.mail import send_mail
-from datetime import timedelta
-
 from django.conf import settings
 from celery import Celery
-from celery.decorators import periodic_task
+import json
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'task_manager.settings')
 
@@ -23,21 +18,29 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 # Load task modules from all registered Django apps.
 app.autodiscover_tasks()
 
-@periodic_task(run_every=timedelta(seconds=10))
-def send_email_reminder():
-    from django.contrib.auth.models import User
-    from tasks.models import Task
+from datetime import timedelta
 
-    print("Starting to process Emails")
-    for user in User.objects.all():
-        pending_tasks = Task.objects.filter(user=user, completed=False, deleted=False)
-        email_content = f"You have {pending_tasks.count()} Pending Tasks"
-        send_mail("Pending Tasks from Tasks Manager", email_content, "tasks@task_manager.org", ["syedareehaquasar@gmail.com"])
-        print(f"Completed Processing User {user.id}")
+from celery.decorators import periodic_task
+from django.core.mail import send_mail
 
-@app.task
-def test_background_jobs():
-    print("This is from bg")
-    for i in range(10):
-        time.sleep(1)
-        print(i)
+
+@periodic_task(run_every=timedelta(seconds=5))
+def send_report(user):
+    from tasks.models import Report, Task
+
+    def user_tasks(user):
+        print("In user_task")
+        tasks = Task.objects.filter(user=user, completed=False, deleted=False).order_by("status")
+        return {
+            "name": user.username.capitalize(),
+            "status": dict(tasks)
+        }
+    
+    tasks = user_tasks(user)
+    if not tasks:
+        report = "\n No tasks scheduled! \n"
+    else:
+        report = f"Hey {user}! \n Here is your task report for today: \n"
+        report += json.dumps(tasks)
+    
+    send_mail("Daily Tasks Status Report [Task Manager]", report, "tasks@gdc.com", ["syedareehaquasar@gmail.com"])

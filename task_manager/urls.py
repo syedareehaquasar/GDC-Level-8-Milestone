@@ -15,6 +15,7 @@ from tasks.views import (
     GenericCompletedTaskView,
     GenericTaskCompleteView,
     index,
+    reportSettings
 )
 
 from tasks.apiviews import TaskListAPI, TaskViewSet, TaskHistoryViewSet
@@ -47,4 +48,5 @@ urlpatterns = [
     path("user/login/", UserLoginView.as_view()),
     path("user/logout/", LogoutView.as_view()),
     path("sessiontest/", session_storage_view),
+    path("reportSettings/", reportSettings.as_view())
 ]
